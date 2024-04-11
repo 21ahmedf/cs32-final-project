@@ -31,14 +31,6 @@ class Schedule:
         for day, conflicts in zip(range(1, 8), conflicts_per_day):
             self.schedule[day].extend(conflicts)
 
-    def _check_conflicts(self, day, new_conflicts):
-        for new_conflict in new_conflicts:
-            new_start_time, new_end_time, _ = new_conflict
-            for existing_conflict in self.schedule[day]:
-                existing_start_time, existing_end_time, _ = existing_conflict
-                if (new_start_time <= existing_end_time and new_end_time >= existing_start_time):
-                    raise ValueError(f"Conflict detected on {day}: {new_start_time}-{new_end_time} overlaps with existing conflict {existing_start_time}-{existing_end_time}")
-
 class Actor:
     def __init__(self, name, max_hours_per_week):
         self.name = name
