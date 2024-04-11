@@ -31,14 +31,6 @@ class Schedule:
         for day, conflicts in zip(range(1, 8), conflicts_per_day):
             self.schedule[day].extend(conflicts)
 
-    def _check_conflicts(self, day, new_conflicts):
-        for new_conflict in new_conflicts:
-            new_start_time, new_end_time, _ = new_conflict
-            for existing_conflict in self.schedule[day]:
-                existing_start_time, existing_end_time, _ = existing_conflict
-                if (new_start_time <= existing_end_time and new_end_time >= existing_start_time):
-                    raise ValueError(f"Conflict detected on {day}: {new_start_time}-{new_end_time} overlaps with existing conflict {existing_start_time}-{existing_end_time}")
-
 class Actor:
     def __init__(self, name, max_hours_per_week):
         self.name = name
@@ -138,30 +130,25 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
                 if not conflicts:
                     available_time_slots.append((day_name, "6:00 PM", "11:30 PM"))
                 else:
-                    last_end_time = "11:30 PM"
                     for conflict in conflicts:
-                        conflict_type, start_time, end_time = conflict
-                        if conflict_type != "academic" and conflict_type != "other":  # Skip non-time data
-                            available_time_slots.append((day_name, last_end_time, start_time))
-                            last_end_time = end_time if end_time <= "11:30 PM" else "11:30 PM"
-                    available_time_slots.append((day_name, last_end_time, "11:30 PM"))
-
-            available_time_slots.sort()
+                        start_time, end_time = conflict[0], conflict[1]
+                        # need to add conflicts into set of unavailable time slots
+                    # then see what values in between 6:00 PM and 11:30 PM don't overlap with the
+                    # unavailable time slots and add those open times to available time slots instead
 
             for day, start_time, end_time in available_time_slots:
-                if start_time != "academic" and start_time != "other":  # Skip non-time data
-                    duration = rehearsal.duration
-                    rehearsal_end_time = (datetime.strptime(start_time, "%I:%M %p") + timedelta(hours=duration)).strftime("%I:%M %p")
+                duration = rehearsal.duration
+                rehearsal_end_time = (datetime.strptime(start_time, "%I:%M %p") + timedelta(hours=duration)).strftime("%I:%M %p")
 
-                    # Check if all required participants are available
-                    all_available = True
-                    for required_person in required_people:
-                        if required_person not in participant.name:
-                            all_available = False
-                            break
+                # Check if all required participants are available
+                all_available = True
+                for required_person in required_people:
+                    if required_person not in participant.name:
+                        all_available = False
+                        break
 
-                    if all_available and end_time <= "11:30 PM":
-                        print(f"All required participants are available for {rehearsal.name} on {day} from {start_time} to {rehearsal_end_time}")
+                if all_available and end_time <= "11:30 PM":
+                    print(f"All required participants are available for {rehearsal.name} on {day} from {start_time} to {rehearsal_end_time}")
 
 rehearsals = [blue_wind_music]
 assign_rehearsal_times(rehearsals, actors, staff_members)
