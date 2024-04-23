@@ -288,4 +288,3 @@ rehearsals = [blue_wind_music, word_of_your_body_staging, mama_who_bore_me_repri
 actors = [Hannah, Shannon, Jonah, Kiesse, Ria, Riley, Andreea]
 staff_members = [Fahim, Grace, Caron, Adrienne]
 assign_rehearsal_times(rehearsals, actors, staff_members)
-
