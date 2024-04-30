@@ -172,12 +172,6 @@ rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, 
 
 #rehearsals_week_1 = [test_rehearsal]
 
-actors = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
-          Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
-
-#staff_members = [Fahim, Joe, Henry, Grace, Caron, Adrienne]
-staff_members = [Fahim, Grace, Caron, Adrienne]
-
 # assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
 
 #rehearsals_week_2 = [test_rehearsal]

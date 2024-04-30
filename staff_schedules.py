@@ -119,3 +119,5 @@ Adrienne_conflicts = [
 ]
 
 Adrienne.schedule.add_conflicts(Adrienne_conflicts)
+
+staff_members = [Fahim, Joe, Henry, Grace, Caron, Adrienne]

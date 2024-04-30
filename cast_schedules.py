@@ -281,6 +281,9 @@ Mattheus_conflicts = [
 ]
 Mattheus.schedule.add_conflicts(Mattheus_conflicts)
 
+
+actors = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
+          Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
 upper_voices = ["Shannon", "Hannah", "Andreea", "Kiesse", "Riley", "Ria", "Anna", "Daniela", "Lindsay", "Texaco"]
 lower_voices = ["Jonah", "Nikhil", "Andrew", "Jared", "Sean", "Ben", "Rob", "Alvin", "Saswato", "Mattheus"]
 ALL = upper_voices + lower_voices
