@@ -1,56 +1,73 @@
 ####### DEFINING FUNCTIONS #######
 
 import numpy as np
-from staff_schedules import *
-from cast_schedules import *
+from staff_schedules import * # Imports schedules of staff
+from cast_schedules import * # Imports schedules of cast
 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 class Rehearsal:
     def __init__(self, name, rehearsal_type, duration, required_people):
+
+        # Initializes a Rehearsal object with its name, type, duration, and the people required for it
         self.name = name
         self.type = rehearsal_type
         self.duration = duration # in hours
         self.required_people = required_people
 
-    # raise an error that says that an actor has been called for too many hours if necessary
-
 # Convert decimal hours to 12-hour format with AM/PM
 def format_time(decimal_time):
-    # Ensure the time wraps correctly by taking modulo 24
-    hours = int(decimal_time)
-    minutes = int((decimal_time - hours) * 60)
-    period = "AM" if hours < 12 else "PM"
+    # Converts time in decimal hours to a 12-hour clock format with AM/PM notation
+    hours = int(decimal_time) # Extracts the hour part
+    minutes = int((decimal_time - hours) * 60) # Converts the decimal part to minutes
+    period = "AM" if hours < 12 else "PM" # Determines AM or PM period
+    
+    # Adjusts hour format for 12-hour clock
     hours = hours % 12
     if hours == 0:
         hours = 12
+    
+    # Formats time string
     return f"{hours}:{minutes:02d} {period}"
 
-
+# Check the availability of time blocks for a rehearsal without schedule conflicts
 def check_availability(rehearsal_blocks, day_conflicts, rehearsal_duration):
+    
+     # Initializes a list to store available time blocks
     available_blocks = []
+
+    # Iterates through each proposed time block
     for block in rehearsal_blocks:
         if all(block + i * 0.25 not in [bc for start, end in day_conflicts for bc in np.arange(start, end, 0.25)]
             for i in range(int(rehearsal_duration / 0.25))):
+            
+            # Adds block to available_blocks if it's free of conflicts
             available_blocks.append(block)
+
+    # Returns the list of available time blocks
     return available_blocks
 
+# Function to determine if a specific time block is free from conflicts
 def is_available(time, unavailable_periods):
-    for start, end, _ in unavailable_periods:
-        if start <= time < end:
-            return False
-    return True
+    for start, end, _ in unavailable_periods: # Checks each conflict period
+        if start <= time < end: # If the time falls within a conflict period
+            return False # Returns False, indicating time is not available
+    return True # Returns True if no conflicts are found
 
+# Display which actors are missing from available blocks
 def display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts):
+    
+    # Prints the rehearsal name and day
     print(f"Rehearsal: {rehearsal.name} on {day_names[day-1]}")
-    for block in available_blocks:
-        start_time = format_time(block)
-        end_time = format_time(block + rehearsal.duration)
-        missing_actors = []
+    for block in available_blocks: # For each available time block
+        start_time = format_time(block) # Converts start time to human-readable format
+        end_time = format_time(block + rehearsal.duration) # Converts end time to human-readable format
+        missing_actors = []  # List to hold names of missing actors
 
+        # Check for each required person if they are available during the time block
         for person_name in required_people:
             person = next((actor for actor in actors if actor.name == person_name), None)
             if person and not all(is_available(block + i * 0.25, person.schedule.schedule[day]) for i in range(int(rehearsal.duration / 0.25))):
-                missing_actors.append(person.name)
+                missing_actors.append(person.name) # Adds missing actor's name to the list
 
         if missing_actors:
             print(f"From {start_time} to {end_time}, the following actors would be missing: {', '.join(missing_actors)}")
