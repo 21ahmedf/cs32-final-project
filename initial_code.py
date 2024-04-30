@@ -61,7 +61,7 @@ def display_missing_actors(rehearsal, required_people, day, available_blocks, da
         else:
             print(f"From {start_time} to {end_time}, all actors are available for {rehearsal.name} rehearsal.")
 
-def assign_rehearsal_times(rehearsals, actors, staff_members):
+def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold = 100):
 
     # Define end time in decimal for 11:30 PM
     end_time_decimal = 23.5
@@ -82,6 +82,8 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
             if person.name in required_people:
                 for day in range(1, 8):
                     all_conflicts[day].extend(person.schedule.schedule[day])
+        
+        week_availability_found = False
 
         for day in range(1, 8):
             print(f"\nDay: {day_names[day-1]}")
@@ -92,12 +94,36 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
             else:
                 rehearsal_blocks = [i * 0.25 for i in range(40, int((end_time_decimal - rehearsal.duration) / 0.25))]
 
-            available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
+            if current_threshold < 100:
+                threshold = max(int(len(rehearsal.required_people) * current_threshold / 100), int(len(required_people) * 0.5))
+                available_blocks = [
+                    block for block in rehearsal_blocks if sum(is_available(block + i * 0.25, all_conflicts[day]) for i in range(int(rehearsal.duration / 0.25))
+                    ) >= threshold]
+                
+            else:
+                available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
 
             if available_blocks:
+                week_availability_found = True
                 display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts)
             else:
                 print(f"No available blocks for {rehearsal.name} on this day.")
+        
+        if not week_availability_found:
+
+            if current_threshold == 50:
+                print("Yikes, tough.")
+                break
+
+            alternatives = input(f"No {current_threshold}% availability found all week. Would you like to find times with reduced actor availability (yes/no)? ").strip().lower()
+            if alternatives == 'yes':
+                next_threshold = current_threshold - 10
+                print(f"Searching for {next_threshold}% availability...")
+                assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold=next_threshold)
+            elif alternatives == 'no':
+                print("Proceeding without adjusting for lower availability.")
+            else:
+                print("Invalid input, not checking for lower availability.")
                     
 
 # Define participants, their schedules, and rehearsals, then call assign_rehearsal_times
@@ -125,7 +151,7 @@ my_junk_music_all = Rehearsal("[Vocal] My Junk", "music", 1, ALL)
 touch_me_music_all = Rehearsal("[Vocal] Touch Me", "music", 1, ALL)
 the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "blocking", .75, ["Shannon", "Jonah"])
 
-test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 4, ALL)
+test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 5, ALL)
 
 # rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
 #                      all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
