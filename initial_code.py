@@ -20,6 +20,7 @@ class Rehearsal:
 
 # Convert decimal hours to 12-hour format with AM/PM
 def format_time(decimal_time):
+    # Ensure the time wraps correctly by taking modulo 24
     hours = int(decimal_time)
     minutes = int((decimal_time - hours) * 60)
     period = "AM" if hours < 12 else "PM"
@@ -27,6 +28,7 @@ def format_time(decimal_time):
     if hours == 0:
         hours = 12
     return f"{hours}:{minutes:02d} {period}"
+
 
 def check_availability(rehearsal_blocks, day_conflicts, rehearsal_duration):
     available_blocks = []
@@ -60,8 +62,10 @@ def display_missing_actors(rehearsal, required_people, day, available_blocks, da
             print(f"From {start_time} to {end_time}, all actors are available for {rehearsal.name} rehearsal.")
 
 def assign_rehearsal_times(rehearsals, actors, staff_members):
-    rehearsal_blocks_weekdays = [i * 0.25 for i in range(72, int(23.75 / 0.25))]  # From 6 PM to 11:30 PM
-    rehearsal_blocks_weekends = [i * 0.25 for i in range(40, int(23.75 / 0.25))] # From 10 AM to 11:30 PM
+
+    # Define end time in decimal for 11:30 PM
+    end_time_decimal = 23.5
+
     required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
 
     for rehearsal in rehearsals:
@@ -82,13 +86,19 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
         for day in range(1, 8):
             print(f"\nDay: {day_names[day-1]}")
             day_conflicts = sorted((start, end) for start, end, _ in all_conflicts[day])
-            rehearsal_blocks = rehearsal_blocks_weekdays if day <= 5 else rehearsal_blocks_weekends
+            if day <= 5:
+                # Adjusted to subtract rehearsal duration from the last block
+                rehearsal_blocks = [i * 0.25 for i in range(72, int((end_time_decimal - rehearsal.duration) / 0.25))]
+            else:
+                rehearsal_blocks = [i * 0.25 for i in range(40, int((end_time_decimal - rehearsal.duration) / 0.25))]
+
             available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
 
             if available_blocks:
                 display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts)
             else:
                 print(f"No available blocks for {rehearsal.name} on this day.")
+                    
 
 # Define participants, their schedules, and rehearsals, then call assign_rehearsal_times
 
@@ -115,12 +125,19 @@ my_junk_music_all = Rehearsal("[Vocal] My Junk", "music", 1, ALL)
 touch_me_music_all = Rehearsal("[Vocal] Touch Me", "music", 1, ALL)
 the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "blocking", .75, ["Shannon", "Jonah"])
 
-rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
-                     all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
-                     all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
-                     my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
-                     my_junk_music_all, the_word_of_your_body_blocking]
+test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 4, ALL)
+
+# rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
+#                      all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
+#                      all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
+#                      my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
+#                      my_junk_music_all, the_word_of_your_body_blocking]
+
+rehearsals_week_1 = [test_rehearsal]
+
 actors = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
           Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
+
 staff_members = [Fahim, Joe, Henry, Grace, Caron, Adrienne]
+
 assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
