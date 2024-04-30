@@ -7,10 +7,11 @@ def sort_rehearsals_by_participants(rehearsals):
     return sorted(rehearsals, key=lambda r: len(r.required_people), reverse=True)
 
 def is_available(time, unavailable_periods):
-    # Check if a specific time is within any of the unavailable periods
-    for start, end in unavailable_periods:
-        if start <= time < end:
-            return False
+    for period in unavailable_periods:
+        if len(period) >= 2:
+            start, end = period[:2]  # Safely unpack only the first two elements
+            if start <= time < end:
+                return False
     return True
 
 staff_needed = {
@@ -51,16 +52,20 @@ def find_first_available_slot(rehearsal, available_times, actors, staff_members,
     return None
 
 def assign_rehearsals(rehearsals, actors, staff_members):
-    work_hours = (18, 23.25)
     schedule = {}
     unassigned_rehearsals = rehearsals[:] 
 
     for actor in actors + staff_members:
-        actor.schedule.schedule = {day: [] for day in range(1, 8)}
+        if not hasattr(actor, 'schedule'):
+            actor.schedule = {'schedule': {day: [] for day in range(1, 8)}}
 
     for day in range(1, 8):
         if not unassigned_rehearsals:
             break
+        if day <= 5:
+            work_hours = (18, 23.25)
+        else:
+            work_hours = (10, 23.25)
         available_times = np.arange(work_hours[0], work_hours[1], 0.25)
         day_schedule = []
 
