@@ -3,10 +3,6 @@ from staff_schedules import *
 from cast_schedules import *
 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-# input each actor's schedules manually, this part of the code will vary each week, but recurring conflicts will stay
-    # schedules for each person can be split by day
-    # conflict type should either be "academic" or "other"
-
 # input all the necessary rehearsals for the full rehearsal period (estimate as 4 weeks)
     # this can be a class so that each rehearsal name has a type (blocking, music, choreo), how long it'll take
     # and which people are needed for the rehearsal
@@ -69,7 +65,7 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
     required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
 
     for rehearsal in rehearsals:
-        print(f"\nChecking availability for {rehearsal.name}:")
+        print(f"Checking availability for {rehearsal.name}:")
         required_people = rehearsal.required_people + [staff.name for staff in staff_members
                                                        if required_roles[rehearsal.type] == staff.role]
         

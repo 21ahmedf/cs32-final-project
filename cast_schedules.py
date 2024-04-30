@@ -1,5 +1,9 @@
 from staff_schedules import Schedule
 
+# input each actor's schedules manually, this part of the code will vary each week, but recurring conflicts will stay
+    # schedules for each person can be split by day
+    # conflict type should either be "academic" or "other"
+
 class Actor:
     def __init__(self, name, max_hours_per_week):
         self.name = name
