@@ -189,13 +189,13 @@ the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "
 
 test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 5, ALL)
 
-rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
-                     all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
-                     all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
-                     my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
-                     my_junk_music_all, the_word_of_your_body_blocking]
+# rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
+#                      all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
+#                      all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
+#                      my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
+#                      my_junk_music_all, the_word_of_your_body_blocking]
 
-#rehearsals_week_1 = [blue_wind_music]
+rehearsals_week_1 = [blue_wind_music]
 
 #rehearsals_week_2 = [my_junk_music_girls, all_thats_known_choreo, mama_who_bore_me_reprise_choreo]
 
@@ -205,14 +205,19 @@ rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, 
 
 #rehearsals_week_1 = [test_rehearsal]
 
-assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
-
 #rehearsals_week_2 = [test_rehearsal]
 
 actors_2 = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
           Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
 
 staff_members_2 = [Fahim, Caron, Adrienne]
+
+# Fahim_onetime = [[],[],[],[],[],[],[("2:00 PM", "4:00 PM", "other")]]
+# Sunday one-time conflict for BachSoc Orchestra
+
+# Fahim.schedule.add_conflicts(Fahim_onetime)
+
+assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
 
 # assign_rehearsal_times(rehearsals_week_2, actors_2, staff_members_2)
 ##############################
