@@ -78,69 +78,85 @@ def display_missing_actors(rehearsal, required_people, day, available_blocks, da
 
 ####### MAIN FUNCTION #######
 
-# def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold = 100):
+def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold = 100):
 
-#     # Define end time in decimal for 11:30 PM
-#     end_time_decimal = 23.5
+    # Set the end time for rehearsals each day in decimal hours (11:30 PM)
+    end_time_decimal = 23.5
 
-#     required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
+    # Mapping rehearsal types to the specific staff role required for each type
+    required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
 
-#     for rehearsal in rehearsals:
-#         print(f"Checking availability for {rehearsal.name}:")
-#         required_people = rehearsal.required_people + [staff.name for staff in staff_members
-#                                                        if required_roles[rehearsal.type] == staff.role]
+    # Iterate over each rehearsal to check and assign times based on availability
+    for rehearsal in rehearsals:
+        print(f"Checking availability for {rehearsal.name}:")
+
+        # Aggregate the names of all required people for the rehearsal, including specific staff roles
+        required_people = rehearsal.required_people + [staff.name for staff in staff_members
+                                                       if required_roles[rehearsal.type] == staff.role]
         
-#         print(f"{required_people} must all be present") # just so I can check that it's working
+        print(f"{required_people} must all be present") # just so I can check that it's working
 
-#         # # Gather all conflicts from required participants
-#         all_conflicts = {day: [] for day in range(1, 8)}
+        # Create a dictionary to store conflicts for each day of the week
+        all_conflicts = {day: [] for day in range(1, 8)}
 
-#         for person in actors + staff_members:
-#             if person.name in required_people:
-#                 for day in range(1, 8):
-#                     all_conflicts[day].extend(person.schedule.schedule[day])
+        # Collect all scheduling conflicts from required people across all days of the week
+        for person in actors + staff_members:
+            if person.name in required_people:
+                for day in range(1, 8):
+                    all_conflicts[day].extend(person.schedule.schedule[day])
         
-#         week_availability_found = False
+        # Flag to indicate if any availability was found in the week
+        week_availability_found = False
 
-#         for day in range(1, 8):
-#             print(f"\nDay: {day_names[day-1]}")
-#             day_conflicts = sorted((start, end) for start, end, _ in all_conflicts[day])
-#             if day <= 5:
-#                 # Adjusted to subtract rehearsal duration from the last block
-#                 rehearsal_blocks = [i * 0.25 for i in range(72, int((end_time_decimal - rehearsal.duration) / 0.25))]
-#             else:
-#                 rehearsal_blocks = [i * 0.25 for i in range(40, int((end_time_decimal - rehearsal.duration) / 0.25))]
+        # Check each day of the week for available rehearsal times
+        for day in range(1, 8):
+            print(f"\nDay: {day_names[day-1]}")
 
-#             if current_threshold < 100:
-#                 threshold = max(int(len(rehearsal.required_people) * current_threshold / 100), int(len(required_people) * 0.5))
-#                 available_blocks = [
-#                     block for block in rehearsal_blocks if sum(is_available(block + i * 0.25, all_conflicts[day]) for i in range(int(rehearsal.duration / 0.25))
-#                     ) >= threshold]
+            # Sort daily conflicts to prepare for checking available time blocks
+            day_conflicts = sorted((start, end) for start, end, _ in all_conflicts[day])
+            
+            # Define time blocks for rehearsals, adjusting for weekends
+            if day <= 5:
+                # Weekday timing blocks (post typical work hours)
+                rehearsal_blocks = [i * 0.25 for i in range(72, int((end_time_decimal - rehearsal.duration) / 0.25))]
+            else:
+                # Weekend timing blocks (longer available periods)
+                rehearsal_blocks = [i * 0.25 for i in range(40, int((end_time_decimal - rehearsal.duration) / 0.25))]
+
+             # Adjust threshold for determining availability based on current settings or defaults
+            if current_threshold < 100:
+                threshold = max(int(len(rehearsal.required_people) * current_threshold / 100), int(len(required_people) * 0.5))
+                available_blocks = [
+                    block for block in rehearsal_blocks if sum(is_available(block + i * 0.25, all_conflicts[day]) for i in range(int(rehearsal.duration / 0.25))
+                    ) >= threshold]
                 
-#             else:
-#                 available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
+            else:
+                # Check availability using default method
+                available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
 
-#             if available_blocks:
-#                 week_availability_found = True
-#                 display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts)
-#             else:
-#                 print(f"No available blocks for {rehearsal.name} on this day.")
+             # If available blocks are found, mark week availability as true and display missing actors
+            if available_blocks:
+                week_availability_found = True
+                display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts)
+            else:
+                print(f"No available blocks for {rehearsal.name} on this day.")
         
-#         if not week_availability_found:
+        # If no availability found all week and threshold adjustments are possible, prompt for user input
+        if not week_availability_found:
+            if current_threshold == 50:
+                print(f"No times with at least 50% actor availability found this week.")
+                break
 
-#             if current_threshold == 50:
-#                 print("Yikes, tough.")
-#                 break
-
-#             alternatives = input(f"No {current_threshold}% availability found all week. Would you like to find times with reduced actor availability (yes/no)? ").strip().lower()
-#             if alternatives == 'yes':
-#                 next_threshold = current_threshold - 10
-#                 print(f"Searching for {next_threshold}% availability...")
-#                 assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold=next_threshold)
-#             elif alternatives == 'no':
-#                 print("Proceeding without adjusting for lower availability.")
-#             else:
-#                 print("Invalid input, not checking for lower availability.")
+            # Ask user if they want to try finding availability with a reduced threshold
+            alternatives = input(f"No {current_threshold}% availability found all week. Would you like to find times with reduced actor availability (yes/no)? ").strip().lower()
+            if alternatives == 'yes':
+                next_threshold = current_threshold - 10
+                print(f"Searching for {next_threshold}% availability...")
+                assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold=next_threshold)
+            elif alternatives == 'no':
+                print("Proceeding without adjusting for lower availability.")
+            else:
+                print("Invalid input, not checking for lower availability.")
 
 ###########################################
 
@@ -189,7 +205,7 @@ rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, 
 
 #rehearsals_week_1 = [test_rehearsal]
 
-# assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
+assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
 
 #rehearsals_week_2 = [test_rehearsal]
 
