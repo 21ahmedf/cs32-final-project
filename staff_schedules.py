@@ -1,44 +1,66 @@
 from datetime import datetime
 
 # Function to convert time from 12-hour format to decimal hour military time
+# Since decimals are easier to consider on a continuous scale
 def convert_to_military(time_str):
-    # Parse the time string into a datetime object
+
+    # Parse the time string into a datetime object using the specified format (12-hour clock with AM/PM)
     time_obj = datetime.strptime(time_str, "%I:%M %p")
-    # Convert to military time in decimal hours
+
+    # Convert to military time in decimal hours, where minutes are a fraction of an hour
     return time_obj.hour + time_obj.minute / 60
 
 class Schedule:
     def __init__(self, actor_name):
+
+        # Initializes a Schedule with an actor's name and an empty schedule for each day of the week
         self.actor_name = actor_name
+
+        # Dictionary comprehension to initialize each day
         self.schedule = {day: [] for day in range(1, 8)}  # 7 days in a week
 
     def add_conflicts(self, conflicts_per_day):
+
+        # Ensure conflicts data is provided for all 7 days, raise an error if not
         if len(conflicts_per_day) != 7:
             raise ValueError("Conflicts per day should be provided for all 7 days")
+        
+        # Loop through each day's conflicts and add them to the schedule
         for day, conflicts in enumerate(conflicts_per_day, start=1):
-            # Convert and add conflicts
+
+            # Convert start and end times to military format and add the conflict type
             self.schedule[day].extend([(convert_to_military(start), convert_to_military(end), conflict_type) for start, end, conflict_type in conflicts])
 
-# input each rehearsal staff member's schedules manually as well
+# input each rehearsal staff member's schedules manually
     # music director's schedule is relevant to music rehearsals
     # choreographer's schedule is relevant to choreo rehearsals
-    # director's schedule is relevant to all types of rehearsals, but essential for blocking rehearsals
+    # director's schedule is relevant to blocking rehearsals
 
+# Example class for staff members, including scheduling based on their role
 class Staff:
     def __init__(self, name, role, max_hours_per_week):
+
+        # Constructor for Staff class, initializing with name, role, and maximum weekly hours
         self.name = name
         self.role = role
-        self.schedule = Schedule(name)
-        self.max_hours_per_week = max_hours_per_week
+        self.schedule = Schedule(name) # Each staff member has their own schedule
+        self.max_hours_per_week = max_hours_per_week 
     
     def __str__(self):
-        staff_info = f"Staff Member: {self.name}\n"
+
+        # Generate a string representation of a staff member, including their schedule
+        staff_info = f"Staff Member: {self.name}\n" # Start with staff name
         staff_info += "Schedule:\n"
+
+        # Iterate over each day in the staff member's schedule to display conflicts
         for day, conflicts in self.schedule.schedule.items():
             staff_info += f"Day {day}:\n"
             for conflict in conflicts:
                 start_time, end_time, conflict_type = conflict
+
+                # Display conflict details including times and types
                 staff_info += f"    - {start_time} to {end_time}: {conflict_type}\n"
+                
         return staff_info
 
 Fahim = Staff("Fahim", "music_director", 20)

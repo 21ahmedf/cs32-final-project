@@ -1,25 +1,44 @@
 from staff_schedules import Schedule
 
-# input each actor's schedules manually, this part of the code will vary each week, but recurring conflicts will stay
-    # schedules for each person can be split by day
-    # conflict type should either be "academic" or "other"
+# Recurring conflicts for each actor are established here
 
 class Actor:
     def __init__(self, name, max_hours_per_week):
+
+        # Initializes an actor with a name and a maximum number of hours they can work per week
         self.name = name
         self.max_hours_per_week = max_hours_per_week
+
+        # Each actor has a Schedule object, which tracks their availability and conflicts
         self.schedule = Schedule(name)
 
     def __str__(self):
-        actor_info = f"Actor: {self.name}\n"
+
+        # called when you print an instance of Actor
+
+        # Start building the actor info string with the actor's name
+        actor_info = f"Actor: {self.name}\n" 
+
+        # Add maximum allowed hours
         actor_info += f"Max Hours per Week: {self.max_hours_per_week}\n"
+
+        # Header for the schedule details
         actor_info += "Schedule:\n"
+
+        # Iterate over each day's conflicts in the actor's schedule
         for day, conflicts in self.schedule.schedule.items():
-            actor_info += f"Day {day}:\n"
+            actor_info += f"Day {day}:\n" # Header for each day
+
+            # Loop through each conflict on the current day
             for conflict in conflicts:
-                start_time, end_time, conflict_type = conflict
+                start_time, end_time, conflict_type = conflict # Unpack the conflict details
+
+                # Append conflict details to the actor information string
                 actor_info += f"    - {start_time} to {end_time}: {conflict_type}\n"
+
         return actor_info
+    
+##### ALL ACTORS OF SPRING AWAKENING LISTED HERE WITH THEIR SPRING 2024 SCHEDULES #####
     
 Jonah = Actor("Jonah", 10)
 
@@ -281,9 +300,12 @@ Mattheus_conflicts = [
 ]
 Mattheus.schedule.add_conflicts(Mattheus_conflicts)
 
-
 actors = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
           Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
+
+# split is since some rehearsals are just for upper voices, some just for lower voices
 upper_voices = ["Shannon", "Hannah", "Andreea", "Kiesse", "Riley", "Ria", "Anna", "Daniela", "Lindsay", "Texaco"]
 lower_voices = ["Jonah", "Nikhil", "Andrew", "Jared", "Sean", "Ben", "Rob", "Alvin", "Saswato", "Mattheus"]
+
+# ALL is the list of strings version of "actors"
 ALL = upper_voices + lower_voices
