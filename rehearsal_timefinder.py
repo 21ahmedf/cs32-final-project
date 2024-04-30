@@ -162,9 +162,7 @@ def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold 
 
 ####### DEFINING EXAMPLE REHEARSALS #######
 
-# Define participants, their schedules, and rehearsals, then call assign_rehearsal_times
-
-# Week 1 Rehearsals
+##### Week 1 Rehearsals #####
 blue_wind_music = Rehearsal("[Vocal] Blue Wind", "music", 1, ["Hannah"])
 touch_me_music_georg = Rehearsal("[Vocal] Touch Me - Georg", "music", .5, ["Sean"])
 act_1_scene_1 = Rehearsal("[Blocking] Act 1, Scene 1", "blocking", 1, ["Texaco", "Shannon"])
@@ -204,13 +202,6 @@ rehearsals_week_1 = [blue_wind_music]
 ####### TESTING IT OUT #######
 
 #rehearsals_week_1 = [test_rehearsal]
-
-#rehearsals_week_2 = [test_rehearsal]
-
-actors_2 = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
-          Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
-
-staff_members_2 = [Fahim, Caron, Adrienne]
 
 # Fahim_onetime = [[],[],[],[],[],[],[("2:00 PM", "4:00 PM", "other")]]
 # Sunday one-time conflict for BachSoc Orchestra
