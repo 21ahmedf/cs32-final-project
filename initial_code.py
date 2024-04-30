@@ -449,14 +449,8 @@ def assign_rehearsal_times(rehearsals, actors, staff_members):
     for rehearsal in rehearsals:
         print(f"Checking availability for {rehearsal.name}:")
         required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
-        required_people = rehearsal.required_people[:]
-        
-        if rehearsal.type in required_roles:
-            # Assume director, music_director, choreographer are names of the staff objects
-            role_name = required_roles[rehearsal.type]
-            for staff in staff_members:
-                if staff.role == role_name:
-                    required_people.append(staff.name)
+        required_people = rehearsal.required_people + [staff.name for staff in staff_members
+                                                       if required_roles[rehearsal.type] == staff.role]
         
         print(f"{required_people} must all be present") # just so I can check that it's working
 
