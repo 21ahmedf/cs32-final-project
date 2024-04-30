@@ -164,6 +164,8 @@ rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, 
 
 #rehearsals_week_1 = [blue_wind_music]
 
+#rehearsals_week_2 = [my_junk_music_girls, all_thats_known_choreo, mama_who_bore_me_reprise_choreo]
+
 ##############################
 
 ####### TESTING IT OUT #######
@@ -178,4 +180,13 @@ staff_members = [Fahim, Grace, Caron, Adrienne]
 
 # assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
 
+#rehearsals_week_2 = [test_rehearsal]
+
+actors_2 = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
+          Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
+
+staff_members_2 = [Fahim, Caron, Adrienne]
+
+# assign_rehearsal_times(rehearsals_week_2, actors_2, staff_members_2)
 ##############################
+
