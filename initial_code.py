@@ -1,4 +1,5 @@
 from datetime import datetime
+import numpy as np
 
 # Function to convert time from 12-hour format to decimal hour military time
 def convert_to_military(time_str):
@@ -6,6 +7,8 @@ def convert_to_military(time_str):
     time_obj = datetime.strptime(time_str, "%I:%M %p")
     # Convert to military time in decimal hours
     return time_obj.hour + time_obj.minute / 60
+
+day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 # input each actor's schedules manually, this part of the code will vary each week, but recurring conflicts will stay
     # schedules for each person can be split by day
@@ -91,7 +94,7 @@ Grace_conflicts = [
     [("10:30 AM", "12:00 PM", "academic"), ("1:30 PM", "3:00 PM", "academic")],  # Tuesday
     [("9:00 AM", "10:30 AM", "academic")],  # Wednesday
     [("10:30 AM", "12:00 PM", "academic"), ("1:30 PM", "4:30 PM", "academic")],  # Thursday
-    [("10:30 PM", "12:00 PM", "academic"), ("12:30 PM", "2:00 PM", "academic")],  # Friday
+    [("10:30 AM", "12:00 PM", "academic"), ("12:30 PM", "2:00 PM", "academic")],  # Friday
     [("11:30 AM", "12:30 PM", "other")],  # Saturday
     [],  # Sunday
 ]
@@ -416,20 +419,9 @@ class Rehearsal:
         self.duration = duration # in hours
         self.required_people = required_people
 
-# set limit for how many hours an actor can be called per week
-    # most likely 10 hours
-
 # assign rehearsal times based on minimum 80% actor availability for group rehearsals, 100% availability for
 # small group or solo rehearsals 
     # raise an error that says that an actor has been called for too many hours if necessary
-
-rehearsal_blocks = [i * 0.25 for i in range(36, int(24 / 0.25))]
-
-def is_available(time, unavailable_periods):
-    for start, end in unavailable_periods:
-        if start <= time < end:
-            return False
-    return True
 
 # Convert decimal hours to 12-hour format with AM/PM
 def format_time(decimal_time):
@@ -441,36 +433,67 @@ def format_time(decimal_time):
         hours = 12
     return f"{hours}:{minutes:02d} {period}"
 
+def check_availability(rehearsal_blocks, day_conflicts, rehearsal_duration):
+    available_blocks = []
+    for block in rehearsal_blocks:
+        if all(block + i * 0.25 not in [bc for start, end in day_conflicts for bc in np.arange(start, end, 0.25)]
+            for i in range(int(rehearsal_duration / 0.25))):
+            available_blocks.append(block)
+    return available_blocks
+
+def is_available(time, unavailable_periods):
+    for start, end, _ in unavailable_periods:
+        if start <= time < end:
+            return False
+    return True
+
+def display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts):
+    print(f"Rehearsal: {rehearsal.name} on {day_names[day-1]}")
+    for block in available_blocks:
+        start_time = format_time(block)
+        end_time = format_time(block + rehearsal.duration)
+        missing_actors = []
+
+        for person_name in required_people:
+            person = next((actor for actor in actors if actor.name == person_name), None)
+            if person and not all(is_available(block + i * 0.25, person.schedule.schedule[day]) for i in range(int(rehearsal.duration / 0.25))):
+                missing_actors.append(person.name)
+
+        if missing_actors:
+            print(f"From {start_time} to {end_time}, the following actors would be missing: {', '.join(missing_actors)}")
+        else:
+            print(f"From {start_time} to {end_time}, all actors are available for {rehearsal.name} rehearsal.")
+
 def assign_rehearsal_times(rehearsals, actors, staff_members):
     rehearsal_blocks_weekdays = [i * 0.25 for i in range(72, int(23.75 / 0.25))]  # From 6 PM to 11:30 PM
-    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     rehearsal_blocks_weekends = [i * 0.25 for i in range(40, int(23.75 / 0.25))] # From 10 AM to 11:30 PM
+    required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
 
     for rehearsal in rehearsals:
         print(f"Checking availability for {rehearsal.name}:")
-        required_roles = {"blocking": "director", "music": "music_director", "choreo": "choreographer"}
         required_people = rehearsal.required_people + [staff.name for staff in staff_members
                                                        if required_roles[rehearsal.type] == staff.role]
         
         print(f"{required_people} must all be present") # just so I can check that it's working
 
-        # Gather all conflicts from required participants
+        # # Gather all conflicts from required participants
         all_conflicts = {day: [] for day in range(1, 8)}
+
         for person in actors + staff_members:
             if person.name in required_people:
                 for day in range(1, 8):
                     all_conflicts[day].extend(person.schedule.schedule[day])
 
-        # Determine available times for each day
-        for day in range(1, 6):
-            day_conflicts = [(start, end) for start, end, _ in all_conflicts[day]]
-            available_times = [format_time(time) for time in rehearsal_blocks_weekdays if is_available(time, day_conflicts)]
-            print(f"Available times on {day_names[day-1]}: {available_times}")
+        for day in range(1, 8):
+            print(f"\nDay: {day_names[day-1]}")
+            day_conflicts = sorted((start, end) for start, end, _ in all_conflicts[day])
+            rehearsal_blocks = rehearsal_blocks_weekdays if day <= 5 else rehearsal_blocks_weekends
+            available_blocks = check_availability(rehearsal_blocks, day_conflicts, rehearsal.duration)
 
-        for day in range(6, 8):
-            day_conflicts = [(start, end) for start, end, _ in all_conflicts[day]]
-            available_times = [format_time(time) for time in rehearsal_blocks_weekends if is_available(time, day_conflicts)]
-            print(f"Available times on {day_names[day-1]}: {available_times}")
+            if available_blocks:
+                display_missing_actors(rehearsal, required_people, day, available_blocks, day_conflicts)
+            else:
+                print(f"No available blocks for {rehearsal.name} on this day.")
 
 # Define participants, their schedules, and rehearsals, then call assign_rehearsal_times
 
@@ -497,7 +520,11 @@ my_junk_music_all = Rehearsal("[Vocal] My Junk", "music", 1, ALL)
 touch_me_music_all = Rehearsal("[Vocal] Touch Me", "music", 1, ALL)
 the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "blocking", .75, ["Shannon", "Jonah"])
 
-rehearsals_week_1 = [mama_who_bore_me_reprise_choreo, mama_who_bore_me_reprise_music]
+rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
+                     all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
+                     all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
+                     my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
+                     my_junk_music_all, the_word_of_your_body_blocking]
 actors = [Jonah, Shannon, Nikhil, Hannah, Andreea, Andrew, Jared, Sean, Ben, Kiesse, Riley,
           Ria, Daniela, Texaco, Anna, Lindsay, Rob, Alvin, Saswato, Mattheus]
 staff_members = [Fahim, Joe, Henry, Grace, Caron, Adrienne]
