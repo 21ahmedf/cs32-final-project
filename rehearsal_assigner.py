@@ -116,11 +116,6 @@ def assign_rehearsals(rehearsals, actors, staff_members):
         print(f"Day {day}:")
         for rehearsal in rehearsals:
             print(f"  - {rehearsal[0]} from {format_time(rehearsal[1])} to {format_time(rehearsal[2])}")
-    #return schedule # Returns the complete schedule
 
 # Running the scheduling
 final_schedule = assign_rehearsals(rehearsals_week_1, actors, staff_members)
-# for day, rehearsals in final_schedule.items():
-#     print(f"Day {day}:")
-#     for rehearsal in rehearsals:
-#         print(f"  - {rehearsal[0]} from {format_time(rehearsal[1])} to {format_time(rehearsal[2])}")
