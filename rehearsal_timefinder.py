@@ -78,7 +78,7 @@ def display_missing_actors(rehearsal, required_people, day, available_blocks, da
 
 ####### MAIN FUNCTION #######
 
-def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold = 100):
+def find_rehearsal_times(rehearsals, actors, staff_members, current_threshold = 100):
 
     # Set the end time for rehearsals each day in decimal hours (11:30 PM)
     end_time_decimal = 23.5
@@ -152,7 +152,7 @@ def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold 
             if alternatives == 'yes':
                 next_threshold = current_threshold - 10
                 print(f"Searching for {next_threshold}% availability...")
-                assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold=next_threshold)
+                find_rehearsal_times(rehearsals, actors, staff_members, current_threshold=next_threshold)
             elif alternatives == 'no':
                 print("Proceeding without adjusting for lower availability.")
             else:
@@ -160,7 +160,7 @@ def assign_rehearsal_times(rehearsals, actors, staff_members, current_threshold 
 
 ###########################################
 
-####### DEFINING EXAMPLE REHEARSALS #######
+####### EXAMPLE REHEARSALS #######
 
 ##### Week 1 Rehearsals #####
 blue_wind_music = Rehearsal("[Vocal] Blue Wind", "music", 1, ["Hannah"])
@@ -187,13 +187,13 @@ the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "
 
 test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 5, ALL)
 
-# rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
-#                      all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
-#                      all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
-#                      my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
-#                      my_junk_music_all, the_word_of_your_body_blocking]
+rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
+                     all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
+                     all_thats_known_music_all, bitch_of_living_music, touch_me_music_otto, all_thats_known_choreo, mama_who_bore_me_reprise_music,
+                     my_junk_music_girls, mama_who_bore_me_blocking, mama_who_bore_me_reprise_choreo, act_1_scene_2_boys, 
+                     my_junk_music_all, the_word_of_your_body_blocking]
 
-rehearsals_week_1 = [blue_wind_music]
+#rehearsals_week_1 = [blue_wind_music]
 
 #rehearsals_week_2 = [my_junk_music_girls, all_thats_known_choreo, mama_who_bore_me_reprise_choreo]
 
@@ -208,8 +208,7 @@ rehearsals_week_1 = [blue_wind_music]
 
 # Fahim.schedule.add_conflicts(Fahim_onetime)
 
-assign_rehearsal_times(rehearsals_week_1, actors, staff_members)
+find_rehearsal_times(rehearsals_week_1, actors, staff_members)
 
-# assign_rehearsal_times(rehearsals_week_2, actors_2, staff_members_2)
 ##############################
 
