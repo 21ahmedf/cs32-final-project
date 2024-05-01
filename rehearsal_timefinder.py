@@ -185,7 +185,7 @@ my_junk_music_all = Rehearsal("[Vocal] My Junk - All", "music", 1, ALL)
 touch_me_music_all = Rehearsal("[Vocal] Touch Me - All", "music", 1, ALL)
 the_word_of_your_body_blocking = Rehearsal("[Blocking] The Word of Your Body", "blocking", .75, ["Shannon", "Jonah"])
 
-test_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 5, ALL)
+long_rehearsal = Rehearsal("[Vocal] Something Crazy", "music", 5, ALL)
 
 rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, act_1_scene_1, act_1_scene_2_adults,
                      all_thats_known_blocking, jonah_vocal_review, touch_me_music_mm, touch_me_music_ernst, all_thats_known_music_boys,
@@ -195,13 +195,11 @@ rehearsals_week_1 = [blue_wind_music, touch_me_music_georg, touch_me_music_all, 
 
 #rehearsals_week_1 = [blue_wind_music]
 
-#rehearsals_week_2 = [my_junk_music_girls, all_thats_known_choreo, mama_who_bore_me_reprise_choreo]
-
 ##############################
 
 ####### TESTING IT OUT #######
 
-#rehearsals_week_1 = [test_rehearsal]
+#rehearsals_week_1 = [long_rehearsal]
 
 # Fahim_onetime = [[],[],[],[],[],[],[("2:00 PM", "4:00 PM", "other")]]
 # Sunday one-time conflict for BachSoc Orchestra
